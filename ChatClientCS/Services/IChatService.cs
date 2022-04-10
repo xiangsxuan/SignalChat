@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ChatClientCS.Models;
 using ChatClientCS.Enums;
+using ChartProtocol;
 
 namespace ChatClientCS.Services
 {

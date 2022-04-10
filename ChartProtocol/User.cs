@@ -1,4 +1,4 @@
-﻿namespace ChatClientCS.Models
+﻿namespace ChartProtocol
 {
     public class User
     {

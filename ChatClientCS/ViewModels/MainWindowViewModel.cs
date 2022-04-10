@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Diagnostics;
 using System.Reactive.Linq;
+using ChartProtocol;
 
 namespace ChatClientCS.ViewModels
 {

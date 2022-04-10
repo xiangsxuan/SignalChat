@@ -186,7 +186,6 @@
   <ItemGroup>
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\Participant.cs" />
-    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -214,7 +213,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ChartProtocol\ChartProtocol.csproj">
+      <Project>{dfa87229-cb01-44c4-aa0b-5b9896bde990}</Project>
+      <Name>ChartProtocol</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Imgs\blank.png" />
   </ItemGroup>
