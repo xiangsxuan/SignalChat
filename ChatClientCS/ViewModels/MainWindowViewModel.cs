@@ -301,7 +301,7 @@ namespace ChatClientCS.ViewModels
             {
                 ChatMessage msg = new ChatMessage { Author = UserName, Picture = pic, Time = DateTime.Now, IsOriginNative = true };
                 SelectedParticipant.Chatter.Add(msg);
-            }           
+            }
         }
 
         private bool CanSendImageMessage()
@@ -441,7 +441,8 @@ namespace ChatClientCS.ViewModels
         private async void Disconnected()
         {
             var connectionTask = chatService.ConnectAsync();
-            await connectionTask.ContinueWith(t => {
+            await connectionTask.ContinueWith(t =>
+            {
                 if (!t.IsFaulted)
                 {
                     IsConnected = true;
@@ -451,12 +452,18 @@ namespace ChatClientCS.ViewModels
             });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name">正在打字的人</param>
         private void ParticipantTyping(string name)
         {
             var person = Participants.Where((p) => string.Equals(p.Name, name)).FirstOrDefault();
             if (person != null && !person.IsTyping)
             {
                 person.IsTyping = true;
+                // 一段时间后, 把IsTyping变成 false
+                // todo: 学一下 Observable.Timer 这个库
                 Observable.Timer(TimeSpan.FromMilliseconds(1500)).Subscribe(t => person.IsTyping = false);
             }
         }
