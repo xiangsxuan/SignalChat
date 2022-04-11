@@ -17,10 +17,16 @@ using ChartProtocol;
 
 namespace ChatClientCS.ViewModels
 {
+    /// <summary>
+    /// Chat 和 Login的View, 都对应到了本ViewModel中
+    /// </summary>
     public class MainWindowViewModel : ViewModelBase
     {
         private IChatService chatService;
         private IDialogService dialogService;
+        /// <summary>
+        /// 为了保存UITask? 确保要在UI线程运行的操作, 都用这个处理?
+        /// </summary>
         private TaskFactory ctxTaskFactory;
         private const int MAX_IMAGE_WIDTH = 150;
         private const int MAX_IMAGE_HEIGHT = 150;
@@ -65,6 +71,7 @@ namespace ChatClientCS.ViewModels
             set
             {
                 _selectedParticipant = value;
+                // vm 设置 m的变化
                 if (SelectedParticipant.HasSentNewMessage) SelectedParticipant.HasSentNewMessage = false;
                 OnPropertyChanged();
             }
@@ -93,6 +100,9 @@ namespace ChatClientCS.ViewModels
         }
 
         private bool _isConnected;
+        /// <summary>
+        /// 是否连接服务端SignalR, 拆分出了细致的属性, 这样各种业务可以根据自己的需要 来使用这些属性
+        /// </summary>
         public bool IsConnected
         {
             get { return _isConnected; }
@@ -253,6 +263,7 @@ namespace ChatClientCS.ViewModels
             catch (Exception) { return false; }
             finally
             {
+                // finally也可写正常逻辑的. 发送成功再操作, 就可以加到finally里
                 ChatMessage msg = new ChatMessage
                 {
                     Author = UserName,
@@ -357,12 +368,19 @@ namespace ChatClientCS.ViewModels
         #endregion
 
         #region Event Handlers
-        private void NewTextMessage(string name, string msg, MessageType mt)
+        /// <summary>
+        /// 服务端通知消息已到
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="msg"></param>
+        /// <param name="mt"></param>
+        private void NewTextMessageHanlder(string name, string msg, MessageType mt)
         {
             if (mt == MessageType.Unicast)
             {
                 ChatMessage cm = new ChatMessage { Author = name, Message = msg, Time = DateTime.Now };
                 var sender = _participants.Where((u) => string.Equals(u.Name, name)).FirstOrDefault();
+
                 ctxTaskFactory.StartNew(() => sender.Chatter.Add(cm)).Wait();
 
                 if (!(SelectedParticipant != null && sender.Name.Equals(SelectedParticipant.Name)))
@@ -372,7 +390,7 @@ namespace ChatClientCS.ViewModels
             }
         }
 
-        private void NewImageMessage(string name, byte[] pic, MessageType mt)
+        private void NewImageMessageHanlder(string name, byte[] pic, MessageType mt)
         {
             if (mt == MessageType.Unicast)
             {
@@ -399,7 +417,7 @@ namespace ChatClientCS.ViewModels
             }
         }
 
-        private void ParticipantLogin(User u)
+        private void ParticipantLoginHanlder(User u)
         {
             var ptp = Participants.FirstOrDefault(p => string.Equals(p.Name, u.Name));
             if (_isLoggedIn && ptp == null)
@@ -412,25 +430,25 @@ namespace ChatClientCS.ViewModels
             }
         }
 
-        private void ParticipantDisconnection(string name)
+        private void ParticipantDisconnectionHanlder(string name)
         {
             var person = Participants.Where((p) => string.Equals(p.Name, name)).FirstOrDefault();
             if (person != null) person.IsLoggedIn = false;
         }
 
-        private void ParticipantReconnection(string name)
+        private void ParticipantReconnectionHanlder(string name)
         {
             var person = Participants.Where((p) => string.Equals(p.Name, name)).FirstOrDefault();
             if (person != null) person.IsLoggedIn = true;
         }
 
-        private void Reconnecting()
+        private void ReconnectingHanlder()
         {
             IsConnected = false;
             IsLoggedIn = false;
         }
 
-        private async void Reconnected()
+        private async void ReconnectedHanlder()
         {
             var pic = Avatar();
             if (!string.IsNullOrEmpty(_userName)) await chatService.LoginAsync(_userName, pic);
@@ -438,7 +456,7 @@ namespace ChatClientCS.ViewModels
             IsLoggedIn = true;
         }
 
-        private async void Disconnected()
+        private async void DisconnectedHanlder()
         {
             var connectionTask = chatService.ConnectAsync();
             await connectionTask.ContinueWith(t =>
@@ -456,7 +474,7 @@ namespace ChatClientCS.ViewModels
         /// 
         /// </summary>
         /// <param name="name">正在打字的人</param>
-        private void ParticipantTyping(string name)
+        private void ParticipantTypingHanlder(string name)
         {
             var person = Participants.Where((p) => string.Equals(p.Name, name)).FirstOrDefault();
             if (person != null && !person.IsTyping)
@@ -481,16 +499,16 @@ namespace ChatClientCS.ViewModels
             dialogService = diagSvc;
             chatService = chatSvc;
 
-            chatSvc.NewTextMessage += NewTextMessage;
-            chatSvc.NewImageMessage += NewImageMessage;
-            chatSvc.ParticipantLoggedIn += ParticipantLogin;
-            chatSvc.ParticipantLoggedOut += ParticipantDisconnection;
-            chatSvc.ParticipantDisconnected += ParticipantDisconnection;
-            chatSvc.ParticipantReconnected += ParticipantReconnection;
-            chatSvc.ParticipantTyping += ParticipantTyping;
-            chatSvc.ConnectionReconnecting += Reconnecting;
-            chatSvc.ConnectionReconnected += Reconnected;
-            chatSvc.ConnectionClosed += Disconnected;
+            chatSvc.NewTextMessageReceived += NewTextMessageHanlder;
+            chatSvc.NewImageMessageReceived += NewImageMessageHanlder;
+            chatSvc.ParticipantLoggedIn += ParticipantLoginHanlder;
+            chatSvc.ParticipantLoggedOut += ParticipantDisconnectionHanlder;
+            chatSvc.ParticipantDisconnected += ParticipantDisconnectionHanlder;
+            chatSvc.ParticipantReconnected += ParticipantReconnectionHanlder;
+            chatSvc.ParticipantTyping += ParticipantTypingHanlder;
+            chatSvc.ConnectionReconnecting += ReconnectingHanlder;
+            chatSvc.ConnectionReconnected += ReconnectedHanlder;
+            chatSvc.ConnectionClosed += DisconnectedHanlder;
 
             ctxTaskFactory = new TaskFactory(TaskScheduler.FromCurrentSynchronizationContext());
         }

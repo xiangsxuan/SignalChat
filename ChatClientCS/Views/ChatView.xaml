@@ -305,6 +305,7 @@
                 </Grid>
             </Border>
             <DataTemplate.Triggers>
+                <!--  如果是自己发的,颜色为蓝色,右对齐  -->
                 <DataTrigger Binding="{Binding IsOriginNative}" Value="True">
                     <Setter TargetName="MessageBorder" Property="HorizontalAlignment" Value="Right" />
                     <Setter TargetName="MessageBorder" Property="Margin" Value="60,0,10,10" />
@@ -407,6 +408,7 @@
                             TextWrapping="Wrap"
                             VerticalScrollBarVisibility="Auto">
                             <i:Interaction.Triggers>
+                                <!--  学习一下, 这样激发事件  -->
                                 <i:EventTrigger EventName="KeyUp">
                                     <i:InvokeCommandAction Command="{Binding TypingCommand}" />
                                 </i:EventTrigger>

@@ -1,5 +1,8 @@
 ﻿namespace ChatClientCS.Enums
 {
+    /// <summary>
+    /// 消息传播范围
+    /// </summary>
     public enum MessageType
     {
         /// <summary>

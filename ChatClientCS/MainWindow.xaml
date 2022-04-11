@@ -23,6 +23,7 @@
     mc:Ignorable="d">
     <i:Interaction.Triggers>
         <i:EventTrigger>
+            <!--  这个命令是怎么绑定上的? 什么用法?  -->
             <i:InvokeCommandAction Command="{Binding ConnectCommand}" />
         </i:EventTrigger>
         <i:EventTrigger EventName="Closing">

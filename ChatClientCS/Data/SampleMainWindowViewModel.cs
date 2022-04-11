@@ -10,6 +10,9 @@ using System.IO;
 
 namespace ChatClientCS.Data
 {
+    /// <summary>
+    /// ChatView [设计阶段]使用的模型
+    /// </summary>
     public class SampleMainWindowViewModel : ViewModelBase
     {
         private string _userName;

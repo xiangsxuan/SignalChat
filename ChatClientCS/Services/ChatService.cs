@@ -10,8 +10,8 @@ namespace ChatClientCS.Services
 {
     public class ChatService : IChatService
     {
-        public event Action<string, string, MessageType> NewTextMessage;
-        public event Action<string, byte[], MessageType> NewImageMessage;
+        public event Action<string, string, MessageType> NewTextMessageReceived;
+        public event Action<string, byte[], MessageType> NewImageMessageReceived;
         public event Action<string> ParticipantDisconnected;
         public event Action<User> ParticipantLoggedIn;
         public event Action<string> ParticipantLoggedOut;
@@ -33,16 +33,16 @@ namespace ChatClientCS.Services
             hubProxy.On<string>("ParticipantLogout", (n) => ParticipantLoggedOut?.Invoke(n));
             hubProxy.On<string>("ParticipantDisconnection", (n) => ParticipantDisconnected?.Invoke(n));
             hubProxy.On<string>("ParticipantReconnection", (n) => ParticipantReconnected?.Invoke(n));
-            hubProxy.On<string, string>("BroadcastTextMessage", (n, m) => NewTextMessage?.Invoke(n, m, MessageType.Broadcast));
-            hubProxy.On<string, byte[]>("BroadcastPictureMessage", (n, m) => NewImageMessage?.Invoke(n, m, MessageType.Broadcast));
-            hubProxy.On<string, string>("UnicastTextMessage", (n, m) => NewTextMessage?.Invoke(n, m, MessageType.Unicast));
-            hubProxy.On<string, byte[]>("UnicastPictureMessage", (n, m) => NewImageMessage?.Invoke(n, m, MessageType.Unicast));
+            hubProxy.On<string, string>("BroadcastTextMessage", (n, m) => NewTextMessageReceived?.Invoke(n, m, MessageType.Broadcast));
+            hubProxy.On<string, byte[]>("BroadcastPictureMessage", (n, m) => NewImageMessageReceived?.Invoke(n, m, MessageType.Broadcast));
+            hubProxy.On<string, string>("UnicastTextMessage", (n, m) => NewTextMessageReceived?.Invoke(n, m, MessageType.Unicast));
+            hubProxy.On<string, byte[]>("UnicastPictureMessage", (n, m) => NewImageMessageReceived?.Invoke(n, m, MessageType.Unicast));
             hubProxy.On<string>("ParticipantTyping", (p) => ParticipantTyping?.Invoke(p));
 
             connection.Reconnecting += Reconnecting;
             connection.Reconnected += Reconnected;
             connection.Closed += Disconnected;
-
+            //ServicePoint 对象允许的最大并发连接数。对于托管的应用程序，默认 ASP.NET 限制为 10，对于所有其他应用程序，默认连接限制为 2。
             ServicePointManager.DefaultConnectionLimit = 10;
             await connection.Start();
         }

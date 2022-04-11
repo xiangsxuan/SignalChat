@@ -20,6 +20,7 @@ namespace ChatClientCS.Commands
 
         public bool CanExecute(object parameter)
         {
+            // 注册了CanExecute就执行检查, 没注册就一直可执行
             return _canExecute == null ? true : _canExecute(parameter);
         }
 

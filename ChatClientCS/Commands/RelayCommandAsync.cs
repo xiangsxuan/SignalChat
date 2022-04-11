@@ -20,6 +20,7 @@ namespace ChatClientCS.Commands
 
         public bool CanExecute(object parameter)
         {
+            // 正在执行时, 标记为不可再执行
             if (!isExecuting && _canExecute == null) return true;
             return (!isExecuting && _canExecute(parameter));
         }
@@ -32,6 +33,7 @@ namespace ChatClientCS.Commands
 
         public async void Execute(object parameter)
         {
+            // 正在执行时, 标记为不可再执行
             isExecuting = true;
             try { await _execute(); }
             finally { isExecuting = false; }

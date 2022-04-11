@@ -4,6 +4,10 @@ using ChatClientCS.ViewModels;
 
 namespace ChatClientCS.Utils
 {
+    /// <summary>
+    /// Ioc容器 与 实例化映射配置. 放在程序App全局
+    /// todo: 这里放在App全局, 程序其他位置就可以用了吗?
+    /// </summary>
     public class ViewModelLocator
     {
         private UnityContainer container;

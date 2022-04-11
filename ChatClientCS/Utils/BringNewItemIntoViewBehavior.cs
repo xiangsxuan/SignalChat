@@ -5,6 +5,7 @@ using System.Windows;
 
 namespace ChatClientCS.Utils
 {
+    // todo: 学习下Behavior
     public class BringNewItemIntoViewBehavior : Behavior<ItemsControl>
     {
         private INotifyCollectionChanged notifier;
@@ -29,6 +30,7 @@ namespace ChatClientCS.Utils
                 var newIndex = e.NewStartingIndex;
                 var newElement = AssociatedObject.ItemContainerGenerator.ContainerFromIndex(newIndex);
                 var item = (FrameworkElement)newElement;
+                // FrameworkElement.BringIntoView: 尝试将此元素放入其所在的任何可滚动区域内的视图中。
                 item?.BringIntoView();
             }
         }
